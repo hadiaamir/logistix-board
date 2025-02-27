@@ -10,8 +10,6 @@ const ThresholdForm = ({ initialData, onCalculate }) => {
   });
 
   useEffect(() => {
-    console.log("initialData", initialData);
-
     // Ensure avgDailySales only gets set once based on the initial data
     if (
       initialData &&

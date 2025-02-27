@@ -1,13 +1,13 @@
-import axios from 'axios';
+import axios from "axios";
 
 const instance = axios.create({
-  baseURL: '/api',
+  baseURL: "/api",
   withCredentials: true,
 });
 
 // Flatten axios response nesting
 instance.interceptors.response.use(
-  res => res.data,
+  (res) => res.data,
   (err) => {
     const error = {
       ...err.response?.data?.error, // Ensure optional chaining to avoid errors
@@ -18,10 +18,8 @@ instance.interceptors.response.use(
 );
 
 // Function for image upload
-export const uploadFile = async ({route, formData, options = {}}) => {
-  console.log('Uploading file:', formData);
-
-  let headers = { 'Content-Type': 'multipart/form-data' };
+export const uploadFile = async ({ route, formData, options = {} }) => {
+  let headers = { "Content-Type": "multipart/form-data" };
 
   if (options.headers) headers = { ...headers, ...options.headers };
 

@@ -1,13 +1,8 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Lexend } from "next/font/google"; // Import Lexend font
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const lexend = Lexend({
+  variable: "--font-lexend", // Set a custom variable for Lexend
   subsets: ["latin"],
 });
 
@@ -19,9 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
-      </body>
+      <body className={lexend.variable}>{children}</body>
     </html>
   );
 }
