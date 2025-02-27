@@ -41,6 +41,8 @@ export async function POST(req) {
       lead_time_days: parseInt(item.lead_time_days, 10), // Convert lead_time_days to an integer
     }));
 
+    console.log("transformedData", transformedData);
+
     // Return the parsed and transformed CSV data
     return NextResponse.json(
       { message: "CSV processed successfully", data: transformedData },

@@ -6,6 +6,7 @@ import ThresholdForm from "../threshold_form/ThresholdForm";
 import Chart from "../chart/Chart";
 import "./InventoryDashboard.scss";
 import InventoryStats from "../inventory_stats/InventoryStats";
+import ExportThresholds from "../export_thresholds/ExportThresholds";
 
 const InventoryDashboard = () => {
   const [csvData, setCsvData] = useState([]);
@@ -17,7 +18,8 @@ const InventoryDashboard = () => {
   /**
    * Handles file upload using the `react-dropzone` library for CSV files.
    * The uploaded CSV file is processed to calculate the average daily sales and
-   * make a POST request to the backend for file storage.
+   * make a POST request to the backend for file storage. It also calculates the thresholds
+   * based on the CSV data and updates the state accordingly.
    */
   const { getRootProps, getInputProps } = useDropzone({
     accept: ".csv", // Restrict accepted file types to .csv
@@ -48,9 +50,20 @@ const InventoryDashboard = () => {
             (sum, row) => sum + row.orders, // Sum all the orders
             0
           );
-          setAvgDailySales(
-            response.data.length ? totalSales / response.data.length : 0 // Calculate average sales per day
-          );
+          const avgDailySales = response.data.length
+            ? totalSales / response.data.length
+            : 0; // Calculate average sales per day
+          setAvgDailySales(avgDailySales); // Store the average daily sales
+
+          console.log("avgDailySales", avgDailySales);
+
+          // Calculate dynamic thresholds
+          handleThresholdCalculation({
+            leadTime: 5, // Example, replace with actual data from form/input
+            safetyStockPercentage: 20, // Example, replace with actual data from form/input
+            avgDailySales: avgDailySales,
+          });
+
           setThresholdData([]); // Reset threshold data since new data is uploaded
         } catch (err) {
           console.error("Upload failed:", err); // Log any errors during upload
@@ -64,15 +77,6 @@ const InventoryDashboard = () => {
     },
   });
 
-  /**
-   * Calculates the inventory threshold based on lead time, safety stock percentage, and average daily sales.
-   * The threshold is then stored in the state for later use, applying the calculation to each row in the CSV data.
-   *
-   * @param {Object} params - The input parameters for the calculation.
-   * @param {number} params.leadTime - The number of days needed to fulfill an order (lead time).
-   * @param {number} params.safetyStockPercentage - The percentage of safety stock to be kept in inventory.
-   * @param {number} params.avgDailySales - The average number of sales per day.
-   */
   const handleThresholdCalculation = ({
     leadTime,
     safetyStockPercentage,
@@ -86,12 +90,23 @@ const InventoryDashboard = () => {
     // Calculate the safety stock using the provided percentage and lead time
     const safetyStock = safetyStockPct * leadTimeDays * dailySales;
 
+    // Calculate the replenishment threshold (e.g., safety stock + 10% buffer)
+    const replenishmentThreshold = safetyStock * 1.1; // Adding 10% buffer for replenishment
+
+    // Calculate the restock threshold (e.g., safety stock + 20% buffer)
+    const restockThreshold = safetyStock * 1.2; // Adding 20% buffer for restock
+
     // Map through the CSV data and calculate thresholds for each row
     const newThresholdData = csvData.map((row) => ({
       date: row.date, // Keep the original date from the CSV data
       inventory_level: row.inventory_level, // Keep the original inventory level from the CSV data
-      threshold: leadTimeDays * dailySales + safetyStock, // Calculate the inventory threshold
+      safetyStockThreshold: safetyStock, // Dynamic safety stock threshold
+      replenishmentThreshold, // Dynamic replenishment threshold
+      restockThreshold, // Dynamic restock threshold
+      calculatedThreshold: leadTimeDays * dailySales + safetyStock, // Overall threshold
     }));
+
+    console.log("newThresholdData", newThresholdData);
 
     // Update the state with the calculated threshold data
     setThresholdData(newThresholdData); // Store the new threshold data
@@ -128,6 +143,9 @@ const InventoryDashboard = () => {
           onCalculate={handleThresholdCalculation}
         />
       </div>
+
+      {/* Export Button for Thresholds */}
+      <ExportThresholds thresholdData={thresholdData} />
     </div>
   );
 };
