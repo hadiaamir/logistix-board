@@ -1,23 +1,29 @@
 import axios from "axios";
 
-const http = axios.create({
-  baseURL: "/api", // Ensure correct base URL
-  headers: { "Content-Type": "application/json" },
+const instance = axios.create({
+  baseURL: "/api",
+  withCredentials: true,
 });
 
-// flattens the layer of nested introduced by axios
-// the responses look like { data, error }, but axios nests the whole response under 'data'
-http.interceptors.response.use(
+// Flatten axios response nesting
+instance.interceptors.response.use(
   (res) => res.data,
   (err) => {
     const error = {
-      ...err.response.data.error,
+      ...err.response?.data?.error, // Ensure optional chaining to avoid errors
       ...err,
     };
-
-    // console.error(error);
     return Promise.reject(error);
   }
 );
 
-export default http;
+// Function for image upload
+export const uploadFile = async ({ route, formData, options = {} }) => {
+  let headers = { "Content-Type": "multipart/form-data" };
+
+  if (options.headers) headers = { ...headers, ...options.headers };
+
+  return instance.post(route, formData, { ...options, headers });
+};
+
+export default instance;
