@@ -1,0 +1,55 @@
+.inv_dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+
+  &__title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+
+  &__dropzone {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    border: 2px dashed #007bff;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #fff;
+    &:hover {
+      background-color: #f1f1f1;
+    }
+  }
+
+  &__status {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #007bff;
+  }
+
+  &__error {
+    margin-top: 10px;
+    font-size: 16px;
+    color: red;
+  }
+
+  &__chart {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 800px;
+  }
+}
+
+.inv_dashboard__bottom-section {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  background-color: #fff;
+  padding: 2rem;
+}
